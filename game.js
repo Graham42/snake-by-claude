@@ -45,7 +45,15 @@ const gameState = {
     speed: 150,
     shouldGrow: false,
     difficulty: null,           // Selected difficulty object
-    foodTimerId: null          // Timer ID for food relocation
+    difficultyKey: null,        // Difficulty key (EASY, MEDIUM, HARD)
+    foodTimerId: null,          // Timer ID for food relocation
+    gameStartTime: null,        // Timestamp when game started
+    leaderboard: {
+        scores: [],
+        loading: false,
+        error: null,
+        playerRank: null
+    }
 };
 
 // ===========================
@@ -382,6 +390,125 @@ const UI = {
 
     hideOverlay() {
         overlayElement.classList.add('hidden');
+    },
+
+    showLeaderboard(scores, playerRank, error) {
+        const section = document.getElementById('leaderboardSection');
+        const loading = document.getElementById('leaderboardLoading');
+        const errorEl = document.getElementById('leaderboardError');
+        const list = document.getElementById('leaderboardList');
+
+        section.classList.remove('hidden');
+        loading.classList.add('hidden');
+
+        if (error) {
+            errorEl.textContent = error;
+            errorEl.classList.remove('hidden');
+            list.classList.add('hidden');
+            return;
+        }
+
+        errorEl.classList.add('hidden');
+        list.classList.remove('hidden');
+        list.innerHTML = '';
+
+        if (scores.length === 0) {
+            list.innerHTML = '<li class="leaderboard-empty">No scores yet. Be the first!</li>';
+            return;
+        }
+
+        scores.forEach((entry, index) => {
+            const li = document.createElement('li');
+            li.className = 'leaderboard-entry';
+            if (playerRank && index + 1 === playerRank) {
+                li.classList.add('player-score');
+            }
+
+            li.innerHTML = `
+                <span class="rank">#${index + 1}</span>
+                <span class="score">${entry.score}</span>
+                <span class="difficulty-badge">${entry.difficulty}</span>
+            `;
+            list.appendChild(li);
+        });
+    },
+
+    showLeaderboardLoading() {
+        const section = document.getElementById('leaderboardSection');
+        const loading = document.getElementById('leaderboardLoading');
+        const errorEl = document.getElementById('leaderboardError');
+        const list = document.getElementById('leaderboardList');
+
+        section.classList.remove('hidden');
+        loading.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        list.classList.add('hidden');
+    },
+
+    hideLeaderboard() {
+        const section = document.getElementById('leaderboardSection');
+        section.classList.add('hidden');
+    }
+};
+
+// ===========================
+// Leaderboard Module
+// ===========================
+const Leaderboard = {
+    baseUrl: '/.netlify/functions',
+
+    async submitScore(score, difficulty, snakeLength, gameTime) {
+        try {
+            const response = await fetch(`${this.baseUrl}/submit-score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    score,
+                    timestamp: Date.now(),
+                    gameData: {
+                        difficulty,
+                        snakeLength,
+                        gameTime
+                    }
+                })
+            });
+
+            const data = await response.json();
+            return {
+                success: data.success,
+                rank: data.rank,
+                error: data.error
+            };
+        } catch (error) {
+            console.error('Failed to submit score:', error);
+            return { success: false, error: 'Network error' };
+        }
+    },
+
+    async fetchLeaderboard() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(`${this.baseUrl}/get-leaderboard`, {
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            const data = await response.json();
+            return {
+                success: data.success,
+                scores: data.scores || [],
+                error: data.error
+            };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                return { success: false, scores: [], error: 'Request timed out' };
+            }
+            console.error('Failed to fetch leaderboard:', error);
+            return { success: false, scores: [], error: 'Unable to connect' };
+        }
     }
 };
 
@@ -433,6 +560,7 @@ const Game = {
 
     selectDifficulty(difficultyLevel) {
         gameState.difficulty = CONFIG.DIFFICULTY[difficultyLevel];
+        gameState.difficultyKey = difficultyLevel;
     },
 
     resizeCanvas() {
@@ -465,9 +593,13 @@ const Game = {
         Snake.initialize();
         Food.generate();  // This now starts the food timer
 
+        // Record game start time
+        gameState.gameStartTime = Date.now();
+
         // Update UI
         UI.updateScore();
         UI.hideOverlay();
+        UI.hideLeaderboard();
 
         // Start game loop with difficulty-based speed
         gameState.speed = gameState.difficulty.initialSpeed;
@@ -524,7 +656,7 @@ const Game = {
         gameState.gameLoopId = setTimeout(() => this.loop(), gameState.speed);
     },
 
-    gameOver() {
+    async gameOver() {
         gameState.isPlaying = false;
 
         // Clear timers
@@ -533,7 +665,43 @@ const Game = {
         }
         Food.clearTimer();  // Stop food timer
 
+        // Calculate game time
+        const gameTime = Date.now() - gameState.gameStartTime;
+
         UI.showOverlay(true);
+        UI.showLeaderboardLoading();
+
+        // Submit score and fetch leaderboard (non-blocking)
+        try {
+            // Submit score first
+            const submitResult = await Leaderboard.submitScore(
+                gameState.score,
+                gameState.difficultyKey,
+                gameState.snake.length,
+                gameTime
+            );
+
+            gameState.leaderboard.playerRank = submitResult.rank;
+
+            // Then fetch updated leaderboard
+            const leaderboardResult = await Leaderboard.fetchLeaderboard();
+
+            if (leaderboardResult.success) {
+                gameState.leaderboard.scores = leaderboardResult.scores;
+                gameState.leaderboard.error = null;
+                UI.showLeaderboard(
+                    leaderboardResult.scores,
+                    submitResult.rank,
+                    null
+                );
+            } else {
+                gameState.leaderboard.error = leaderboardResult.error;
+                UI.showLeaderboard([], null, leaderboardResult.error);
+            }
+        } catch (error) {
+            console.error('Leaderboard error:', error);
+            UI.showLeaderboard([], null, 'Unable to load leaderboard');
+        }
     }
 };
 

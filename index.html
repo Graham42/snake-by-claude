@@ -22,6 +22,14 @@
                     <p id="overlayMessage">Choose your difficulty</p>
                     <p id="finalScore" class="hidden"></p>
 
+                    <!-- Leaderboard Section (visible on game over only) -->
+                    <div id="leaderboardSection" class="hidden">
+                        <h3>Global Top 20</h3>
+                        <div id="leaderboardLoading" class="loading-spinner hidden">Loading...</div>
+                        <div id="leaderboardError" class="error-message hidden"></div>
+                        <ol id="leaderboardList" class="leaderboard-list"></ol>
+                    </div>
+
                     <!-- Difficulty Selection (visible on start screen only) -->
                     <div id="difficultyButtons" class="difficulty-buttons">
                         <button class="difficulty-btn" data-difficulty="EASY">Easy</button>
