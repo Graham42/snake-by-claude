@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>Snake Game</h1>
+            <div class="score-display">Score: <span id="score">0</span></div>
+        </header>
+
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-content">
+                    <h2 id="overlayTitle">Snake Game</h2>
+                    <p id="overlayMessage">Choose your difficulty</p>
+                    <p id="finalScore" class="hidden"></p>
+
+                    <!-- Difficulty Selection (visible on start screen only) -->
+                    <div id="difficultyButtons" class="difficulty-buttons">
+                        <button class="difficulty-btn" data-difficulty="EASY">Easy</button>
+                        <button class="difficulty-btn" data-difficulty="MEDIUM">Medium</button>
+                        <button class="difficulty-btn" data-difficulty="HARD">Hard</button>
+                    </div>
+
+                    <!-- Start button (hidden initially, shown after difficulty selected) -->
+                    <button id="startButton" class="hidden">Start Game</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="controls-info">
+            <p>Desktop: Arrow Keys or WASD | Mobile: Swipe</p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

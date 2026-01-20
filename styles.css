@@ -1,0 +1,249 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #f0f0f0;
+}
+
+/* Game Container */
+.game-container {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 24px;
+    max-width: 650px;
+    width: 95%;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #1a1a2e;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.score-display {
+    font-size: 20px;
+    font-weight: 600;
+    color: #16213e;
+}
+
+#score {
+    color: #00ff41;
+    font-weight: 700;
+}
+
+/* Canvas Wrapper */
+.canvas-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+#gameCanvas {
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 3px solid #1a1a2e;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    display: block;
+    max-width: 100%;
+    height: auto;
+    touch-action: none;
+}
+
+/* Game Overlay */
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    transition: opacity 0.3s ease;
+}
+
+.game-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-content {
+    text-align: center;
+    color: #ffffff;
+    padding: 32px;
+    max-width: 90%;
+}
+
+.overlay-content h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+    color: #00ff41;
+}
+
+.overlay-content p {
+    font-size: 18px;
+    margin-bottom: 24px;
+    opacity: 0.9;
+}
+
+#finalScore {
+    font-size: 24px;
+    font-weight: 700;
+    color: #00ff41;
+    margin-bottom: 24px;
+}
+
+#finalScore.hidden {
+    display: none;
+}
+
+/* Button */
+#startButton {
+    background: linear-gradient(135deg, #00ff41 0%, #00cc34 100%);
+    color: #1a1a2e;
+    border: none;
+    padding: 14px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 160px;
+    min-height: 44px;
+}
+
+#startButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 255, 65, 0.4);
+}
+
+#startButton:active {
+    transform: scale(0.98);
+}
+
+/* Footer */
+.controls-info {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 16px;
+    }
+
+    header h1 {
+        font-size: 22px;
+    }
+
+    .score-display {
+        font-size: 18px;
+    }
+
+    .overlay-content h2 {
+        font-size: 28px;
+    }
+
+    .overlay-content p {
+        font-size: 16px;
+    }
+
+    #startButton {
+        padding: 12px 28px;
+        font-size: 16px;
+    }
+
+    .controls-info {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 20px;
+    }
+
+    .score-display {
+        font-size: 16px;
+    }
+}
+
+/* Difficulty Selection */
+.difficulty-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.difficulty-btn {
+    background: linear-gradient(135deg, #4ecca3 0%, #3ba883 100%);
+    color: #1a1a2e;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 100px;
+    min-height: 44px;
+}
+
+.difficulty-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(76, 204, 163, 0.4);
+}
+
+.difficulty-btn:active {
+    transform: scale(0.98);
+}
+
+.difficulty-btn.selected {
+    background: linear-gradient(135deg, #00ff41 0%, #00cc34 100%);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+}
+
+/* Responsive difficulty buttons */
+@media (max-width: 480px) {
+    .difficulty-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .difficulty-btn {
+        width: 100%;
+    }
+}
