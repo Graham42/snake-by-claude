@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+/* Generic hidden class */
+.hidden {
+    display: none !important;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -85,6 +90,7 @@ header h1 {
 }
 
 .game-overlay.hidden {
+    display: flex !important; /* Override generic .hidden for smooth transition */
     opacity: 0;
     pointer-events: none;
 }
